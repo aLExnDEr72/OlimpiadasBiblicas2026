@@ -1,0 +1,39 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller openpyxl pillow
+
+      - name: Build EXE
+        run: |
+          pyinstaller ^
+            --onefile ^
+            --windowed ^
+            --name OlimpiadasBiblicas2026 ^
+            --add-data "assets;assets" ^
+            --add-data "audio;audio" ^
+            --add-data "preguntas.xlsx;." ^
+            main.py
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: OlimpiadasBiblicas2026-Windows
+          path: dist/OlimpiadasBiblicas2026.exe
